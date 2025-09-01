@@ -1,0 +1,5 @@
+- hosts: real_machine
+  become: yes
+  roles:
+    - project
+

@@ -1,0 +1,9 @@
+---
+- name: Deploy real project on VM2
+  hosts: ubuntu_vm
+  become: true
+  vars:
+    project_path: "/home/{{ ansible_user }}/real_project"
+
+  roles:
+    - project

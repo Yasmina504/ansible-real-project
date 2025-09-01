@@ -1,0 +1,8 @@
+---
+- name: Deploy real project (web)
+  hosts: webservers
+  become: yes
+  gather_facts: true
+  roles:
+    - project
+

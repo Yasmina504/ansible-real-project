@@ -1,0 +1,20 @@
+---
+- name: Deploy Docker Compose on Ubuntu VM
+  hosts: real_machine
+  become: yes
+
+  tasks:
+    - name: Ensure project directory exists
+      file:
+        path: /home/yasmina/project
+        state: directory
+
+    - name: Copy docker-compose.yml to VM
+      copy:
+        src: ~/Downloads/ansible-project/docker-compose.yml
+        dest: /home/yasmina/project/docker-compose.yml
+
+    - name: Run Docker Compose
+      community.docker.docker_compose:
+        project_src: /home/yasmina/project
+        state: present

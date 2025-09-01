@@ -1,0 +1,6 @@
+---
+- name: Install Docker on Ubuntu VM
+  hosts: real_machine
+  become: yes
+  roles:
+    - docker
