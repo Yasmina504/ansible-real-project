@@ -1,58 +1,9 @@
 ---
-# 1. Ensure project dir exists
-- name: Ensure project directory exists
-  ansible.builtin.file:
-    path: "/home/{{ ansible_user }}/real_project"
-    state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: '0755'
+# tasks file for project
 
-# 2. Copy project files to target (recursive)
-- name: Copy project files to target (recursive)
-  ansible.posix.synchronize:
-    src: "{{ role_path }}/files/real_project/"
-    dest: "/home/{{ ansible_user }}/real_project/"
-    recursive: true
-    delete: no
-  become: false
-
-# 3. Pull docker images (if compose has external images)
-- name: Pull docker images (if compose has external images)
-  ansible.builtin.shell: docker compose -f docker-compose.yml pull
-  args:
-    chdir: "/home/{{ ansible_user }}/real_project"
-  register: pull_result
-  failed_when: false
-
-# 4. Start services with docker compose
-- name: Start project with docker compose
-  ansible.builtin.shell: docker compose -f docker-compose.yml up -d
-  args:
-    chdir: "/home/{{ ansible_user }}/real_project"
-  register: up_result
-
-# 5. Show docker ps
-- name: Show docker ps (short)
-  ansible.builtin.shell: >
-    docker ps --format '{{"{{.Names}} {{.Status}} {{.Ports}}"}}'
-  register: docker_ps
-
-- name: Print docker ps output
-  ansible.builtin.debug:
-    msg: "{{ docker_ps.stdout_lines }}"
-
-# 6. Health check on localhost:80
-- name: Check if web service is responding on localhost:80
-  ansible.builtin.uri:
-    url: "http://localhost:80"
-    return_content: yes
-    status_code: 200
-  register: healthcheck
-  failed_when: healthcheck.status != 200
-
-- name: Print health check snippet
-  ansible.builtin.debug:
-    msg: "{{ healthcheck.content[:200] }}"
-
+- name: Ensure project directory does not exist (remove old one)
+  file:
+    path: "{{ project_path }}"
+    state: absent
+  ignore_errors: yes   # لو المجلد مش موجود، ما يطلعش خطأ
 

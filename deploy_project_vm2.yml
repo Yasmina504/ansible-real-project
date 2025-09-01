@@ -5,5 +5,32 @@
   vars:
     project_path: "/home/{{ ansible_user }}/real_project"
 
-  roles:
-    - project
+  tasks:
+
+    - name: Ensure project directory does not exist (remove old one)
+      file:
+        path: "{{ project_path }}"
+        state: absent
+      ignore_errors: yes
+
+    - name: Ensure project directory exists
+      file:
+        path: "{{ project_path }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Clone real project from GitHub
+      git:
+        repo: 'https://github.com/Yasmina504/docker-flask-app.git'
+        dest: "{{ project_path }}"
+        version: main
+        force: yes
+
+    - name: Run Docker Compose
+      community.docker.docker_compose:
+        project_src: "{{ project_path }}"
+        state: present
+        restarted: yes
+
